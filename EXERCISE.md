@@ -226,7 +226,17 @@ You'll see the following structure (also conveniently described in the
         └── 5-visualize     <- Scripts for visualisation of your results, from 5-visualization to ./report/figures.
 
 This project template is commonly applied in the unit Subsurface and Groundwater
-Systems. All data that you start your project with is stored in the
+Systems. It features a ``README.md`` already describing the folder structure,
+which you can further extend with a project description. Furthermore, it features
+an ``AUTHORS.md`` file where all contributors to the project are credited. Also there is a ``LICENSE`` file describing the license.
+
+> [!WARNING]
+>
+> The license added is very permissive, which we find works fine for most
+> projects. However, you might want to change it to a stricter license. For
+> example, for secret projects you probably want to add a propietary license.
+
+All data that you start your project with is stored in the
 ``data/1-external`` folder, these are usually the files you received from a
 client, or downloaded somewhere. In case of model update, you could treat the
 model before the update as "external data". This data is the starting point of
@@ -250,9 +260,14 @@ stored in ``reports/figures``.
 # 3 Source version control: git
 
 Version control means keeping track of all the changes made to the project. It
-is an essential part of software engineering these days, but is also very useful
+is an essential part of software engineering these days and is also very useful
 in our project work! The most common software for version control these days is
-git. This has the advantage that it is very well tested and documented.
+[git](https://git-scm.com/download/win). This has the advantage that it is very
+well tested, documented, and a wealth of useful tools are available. For
+example, some IDE's (e.g. VSCode) have a built-in git integration, allowing you
+to version control your scripts from there. We'll run you through the basics and
+will only skim the surface. Git allows a lot more things, for example easy
+collaboration on a code base with colleagues.
 
 # 3.1 Initializing git
 
@@ -263,15 +278,141 @@ git init
 ```
 
 This will create a hidden ``.git`` folder, which contains the full history of
-your scripts. Note that your folder also contains a ``.gitignore`` file. This
-was created in the call to cookiecutter template. 
+your scripts. 
 
-This can be opened and edited in any text editor. 
+# 3.2 Committing the initial state
 
-# 3.2 Adding scripts
-
-Up next, we'll add some Python scripts, which are our workflow steps. If you 
+You now have an empty version control system. Time to add some files to it!
+First, let's see what files git can add to its version control system.
+Type:
 
 ```powershell
+git status
+```
+
+This will show you an overview of what files/folders git can add:
+
+![git status initially](/docs/git_status_1.png)
+
+To add all files, type:
+
+```powershell
+git add *
+```
+
+Check the status again:
+
+```powershell
+git status
+```
+
+This will show the files which are added:
+
+![git status after add](/docs/git_status_2.png)
+
+Now comes the most confusing part when learning git: adding files doesn't mean
+they are safely stored yet in the version control system. For that we have to
+commit:
+
+```powershell
+git commit -m "My initial commit"
+```
+
+After committing, files are added to the version control system. The reason why
+git does this in two steps is that it allows you to orchestrate your commits
+into logical steps for the history. In this case this is unnecessary, as we are
+committing everything in one go, but is very useful in more complex situations
+(you have to trust the millions of users git has these days on that for now...)
+
+Type ``git status`` again and it will show you there's nothing to commit. You
+have now succesfully safely stored your text files! Any change you make to the
+files checked into git can now be tracked and reverted back to an old state.
+
+# 3.3 Modifying a file and committing changes
+
+Let's modify a file and commit the changes. Open the ``README.md`` in your
+favorite editor and change the description. If you don't have inspiration what
+to write, you can write "Reproducible workflow to run a groundwater model for
+the Drentse Hondsrug". Save the file, and type ``git status`` again to confirm
+git noticed changes to the file.
+
+![git status after changes](/docs/git_status_3.png)
+
+Note that git also tips you with some commands you could use next: You can
+either ``add`` the README to store changes, or ``restore`` it to its last
+committed state.
+
+Next, let's review the changes you made to the file exactly. Type:
+
+```powershell
+git diff
+```
+
+This will show you the changes you made to the text:
+
+![git diff](/docs/git_diff.png)
+
+If you're satisfied with these changes, we can add them:
+
+```powershell
+git add README.md
+```
+
+and commit them: 
+
+```powershell
+git commit -m "Modify project description"
+```
+
+# 3.4 Checking version history
+
+We can keep track of our version history by typing:
+
+```powershell
+git log
+```
+
+This will print you the two commits you made with their commit messages. Note
+that it therefore is important to write short but descriptive commit messages,
+so you can more easily retrace your steps! Commit messages like "Update" are too
+generic to be of any use.
+
+# 3.5 Excluding files from source version control
+
+Note that your folder also contains a ``.gitignore`` file. This was included in
+the cookiecutter project template. It can be opened and edited in any text
+editor. Open it in your favorite text editor, and you will see certain folders
+and file extensions being listed here. These files will be ignored by git, and
+thus not kept in version control. This is useful: We do not want to store all
+our files, as bulky files can easily clog the version control system, and don't
+have to be stored. We already added a bunch of common files you are very likely
+not to want to add to your version control system in here. For example, you do
+not want your ``.pixi`` folder, containing 2GB of python installation specific
+to your machine, checked in git: the ``pixi.toml`` and ``pixi.lock`` file are
+enough to recreate the ``.pixi`` folder. Therefore the ``.pixi`` folder is
+included in the ``.gitignore`` file. In general, it is best to not commit large
+files to git. Regular git also is not very useful to work with binary data. In
+that case, you are better off using git-lfs or DVC. We'll explain how to use DVC
+in a later stage of this exercise.
+
+# 4 Setting up the workflow
+
+# 4.1 Adding scripts
+
+Up next, we'll add some Python scripts, which are our workflow steps.
+These are already prepared in the folder here ...
+
+# 4.2 Add scripts to snakemake
+
+# 4.3 Create your Snakefile
+
+<details>
+  <summary> If you did everything correct, your Snakefile will look as follows: (<i>click to expand</i>)</summary>
+  <!-- have to be followed by an empty line! -->
 
 ```
+code block
+```
+
+<details>
+
