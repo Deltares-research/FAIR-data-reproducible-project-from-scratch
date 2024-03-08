@@ -395,24 +395,212 @@ files to git. Regular git also is not very useful to work with binary data. In
 that case, you are better off using git-lfs or DVC. We'll explain how to use DVC
 in a later stage of this exercise.
 
-# 4 Setting up the workflow
+# 3.6 Adding scripts to repository
 
-# 4.1 Adding scripts
+Finally, we'll add the Python scripts, which are our workflow steps. These are
+already prepared in the folder ``scripts``. The scripts are named with a prefix
+number indicating in which folder under ``src`` they are supposed to be put. For
+example, ``0-download-data.py`` should be moved to the folder ``src/0-setup``.
+Copy all scripts to their respective folder.
 
-Up next, we'll add some Python scripts, which are our workflow steps.
-These are already prepared in the folder here ...
+If everything went well ``git status`` will list the following files:
 
-# 4.2 Add scripts to snakemake
+![git status scripts](/docs/git_status_scripts.png)
 
-# 4.3 Create your Snakefile
+Add and commit these files the same way you did this before:
+
+```powershell
+git add *
+git commit -m "Added scripts to repository"
+```
+
+# 4 Setting up the workflow: Snakemake 
+
+We have a collection of scripts, which are depending on each other. For example
+``0-download-data.py`` should be called before calling ``1-surface-water.py``,
+as downloaded data is required to schematize the surface water system. Snakemake
+takes care of this. How it works is by checking for each step in the workflow
+what data comes in and what data comes out. This has to be specified explicitly
+by the user. For example, we have to tell snakemake that the file ``river.nc``
+is output of the script ``0-download-data.py`` and input to the script
+``1-surface-water.py``. Snakemake then will deduce by itsself that
+``0-download-data.py`` has to be called before ``1-surface-water.py``. This
+might seem underwhelming for such a trivial situation, but it gets very useful
+in more complex situations, as snakemake deduces the dependence of steps and
+order of computation by itsself.
+
+# 4.1 Create a snakefile
+
+To start configuring our snakemake workflow, start off by creating a file named
+``snakefile``. By default, snakemake will look for a file named ``snakefile`` as
+its configuration file. Snakemake defines its individual steps as "rules". Let's
+add our first rule to the ``snakefile``. Open up your favorite editor, and copy
+the following rule in your ``snakefile``:
+
+```
+rule download_data:
+    output:
+        path_layermodel = "data/1-external/layermodel.nc",
+        path_starting_heads = "data/1-external/starting_heads.nc",
+        path_meteorology = "data/1-external/meteorology.nc",
+        path_drainage = "data/1-external/drainage.nc",
+        path_river = "data/1-external/river.nc",
+    script:
+        "src/0-setup/0-download-data.py"
+```
+
+This rule will call the script ``src/0-setup/0-download-data.py`` and checks if
+it produced the files: ``layermodel.nc``, ``starting_heads.nc``,
+``meteorology.nc``, ``drainage.nc``, ``river.nc``.
+
+Now run:
+
+```powershell
+snakemake -c1
+```
+
+This will run the snakemake workflow. The option ``-c1`` is shorthand for
+``--cores 1`` and will thus tell snakemake to use only one core of your machine.
+This is enough, as we have not defined any independent steps which can be run in
+parallel.
+
+# 4.2 Adding a second step
+
+Let's define the second step to our workflow. We'll call the script
+``src/1-prepare/1-discretization.py`` which creates the model's spatial
+discretization for Modflow 6, based on hydrogeological layers provided in
+``layermodel.nc``. We'll add the rule ``discretization`` above the
+``download_data`` rule, as snakemake by default will look at the first rule to
+run it (and all its dependencies.)
+
+```
+rule discretization:
+    input:
+        path_layermodel = "data/1-external/layermodel.nc",
+    output:
+        path_discretization = "data/2-interim/discretization.nc",
+    script:
+        "src/1-prepare/1-discretization.py"
+
+rule download_data:
+    output:
+        path_layermodel = "data/1-external/layermodel.nc",
+        path_starting_heads = "data/1-external/starting_heads.nc",
+        path_meteorology = "data/1-external/meteorology.nc",
+        path_drainage = "data/1-external/drainage.nc",
+        path_river = "data/1-external/river.nc",
+    script:
+        "src/0-setup/0-download-data.py"
+```
+
+Run again in powershell:
+
+```powershell
+snakemake -c1
+```
+
+# 4.2 Finish your snakefile
 
 <details>
   <summary> If you did everything correct, your Snakefile will look as follows: (<i>click to expand</i>)</summary>
   <!-- have to be followed by an empty line! -->
 
 ```
-code block
+rule plot_heads:
+    input:
+        path_head_nc = "data/5-visualization/groundwater_heads.nc"
+    output:
+        path_figure = "reports/figures/groundwater_heads.png"
+    script:
+        "src/5-visualize/5-plot.py"
+
+rule post_process:
+    input:
+        path_hds = "data/4-output/GWF.hds",
+        path_grb = "data/4-output/dis.dis.grb",
+    output:
+        path_head_nc = "data/5-visualization/groundwater_heads.nc"
+    script:
+        "src/4-analyze/4-post-process.py"
+
+rule run_model:
+    input:
+        path_model = "data/3-input/mfsim.nam"
+    output:
+        path_hds = "data/4-output/GWF.hds",
+        path_grb = "data/4-output/dis.dis.grb",
+    shell:
+        "cd data\\3-input && call ..\\..\\bin\\mf6.exe . && move GWF\\GWF.hds ..\\4-output\\GWF.hds && move GWF\\dis.dis.grb ..\\4-output\\dis.dis.grb"
+
+rule build_model:
+    input:
+        path_discretization = "data/2-interim/discretization.nc",
+        path_drn_pkg = "data/2-interim/drn_pkg.nc",
+        path_riv_pkg = "data/2-interim/riv_pkg.nc",
+        path_recharge =  "data/2-interim/recharge.nc",
+        path_ic = "data/2-interim/ic.nc",
+        path_chd = "data/2-interim/chd.nc",
+        path_subsurface = "data/2-interim/subsurface.nc",
+    output:
+        path_model = "data/3-input/mfsim.nam"
+    script:
+        "src/2-build/2-build-model.py"
+
+rule surface_water:
+    input:
+        path_drainage = "data/1-external/drainage.nc",
+        path_river = "data/1-external/river.nc",
+    output:
+        path_drn_pkg = "data/2-interim/drn_pkg.nc",
+        path_riv_pkg = "data/2-interim/riv_pkg.nc",
+    script:
+        "src/1-prepare/1-surface-water.py"
+
+rule recharge:
+    input:
+        path_meteorology = "data/1-external/meteorology.nc",
+        path_discretization = "data/2-interim/discretization.nc",
+    output:
+        path_recharge = "data/2-interim/recharge.nc",
+    script:
+        "src/1-prepare/1-recharge.py"
+
+rule initial_condition:
+    input:
+        path_starting_heads = "data/1-external/starting_heads.nc",
+        path_discretization = "data/2-interim/discretization.nc",
+    output:
+        path_ic = "data/2-interim/ic.nc",
+        path_chd = "data/2-interim/chd.nc",
+    script:
+        "src/1-prepare/1-initial-condition.py"
+
+rule subsurface:
+    input:
+        path_layermodel = "data/1-external/layermodel.nc",
+    output:
+        path_subsurface = "data/2-interim/subsurface.nc",
+    script:
+        "src/1-prepare/1-subsurface.py"
+
+rule discretization:
+    input:
+        path_layermodel = "data/1-external/layermodel.nc",
+    output:
+        path_discretization = "data/2-interim/discretization.nc",
+    script:
+        "src/1-prepare/1-discretization.py"
+
+rule download_data:
+    output:
+        path_layermodel = "data/1-external/layermodel.nc",
+        path_starting_heads = "data/1-external/starting_heads.nc",
+        path_meteorology = "data/1-external/meteorology.nc",
+        path_drainage = "data/1-external/drainage.nc",
+        path_river = "data/1-external/river.nc",
+    script:
+        "src/0-setup/0-download-data.py"
+
 ```
 
-<details>
 
