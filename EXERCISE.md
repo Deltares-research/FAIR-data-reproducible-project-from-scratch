@@ -398,7 +398,7 @@ explain how to use DVC in a later stage of this exercise.
 ## 3.6 Adding scripts to repository
 
 Finally, we'll add the Python scripts, which are our workflow steps. These are
-already prepared in the folder ``scripts``. The scripts are named with a prefix
+already prepared in the folder [scripts](scripts). The scripts are named with a prefix
 number indicating in which folder under ``src`` they are supposed to be put. For
 example, ``0-download-data.py`` should be moved to the folder ``src/0-setup``.
 Copy all scripts to their respective folder.
@@ -782,7 +782,7 @@ Let's first commit our changes in git:
 git commit -m "Add exe to dvc"
 ```
 
-Now look in the ``.dvc`` folder. A copy of the file will be store
+Now look in the ``.dvc`` folder. A copy of the file is stored in
 ``.dvc/cache/files/md5/68/ee4172873768963691d01d0e55ed80``. This is how DVC
 stores its different versions of data: 
 
