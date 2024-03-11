@@ -895,10 +895,11 @@ On the top, next to the search bar, click the blue "New" button:
 ![](docs/github_new_repository.png)
 
 In the presented form, think of a nice name for your repository, add a brief
-description, and make sure no README and LICENSE are added. This will create an
-empty repository in Github. Github will present us some commands to follow
-depending on our situation. Our case fits *"…or push an existing repository from
-the command line"*. Therefore run the following lines of code:
+description, and make sure no README, .gitignore and LICENSE are added. This
+will create an empty repository in Github, which makes our lives significantly
+easier. Github will present us some commands to follow depending on our
+situation. Our case fits *"…or push an existing repository from the command
+line"*. Therefore run the following lines of code:
 
 ```powershell
 git remote add origin https://github.com/<your_profile_name>/<your_repo_name_on_github>.git 
@@ -909,3 +910,45 @@ git push -u origin main
 Now refresh your browser, and bask at your git repo in all its glory!
 [It should look something like this.](https://github.com/JoerivanEngelen/fair-project-from-scratch-result)
 
+# 6.3 Sharing data: DVC
+
+DVC allows us to store and share data in dependent of Github. This is nice, as
+Github has quite restricted total repository size, [Ideally 1 GB, 5 GB max, and
+a per file limit of max 100
+MB](https://stackoverflow.com/questions/38768454/repository-size-limits-for-github-com).
+This is problematic for most of our projects. Therefore, DVC allows pushing your
+data to different cloud providers (e.g. Amazon S3), self-hosted instances (SSH),
+or network drives (our beloved P: drive). [See the list of supported storages
+here](https://dvc.org/doc/user-guide/data-management/remote-storage#supported-storage-types).
+
+Until we have something better (Deltares-hosted S3-compatible storage (MinIO) is
+in the works, [see
+wiki](https://publicwiki.deltares.nl/display/GIT/Github#Pages-Request).), the
+easiest we can do for now is saving it to our N: drive postbox. This has the
+advantage that this will be cleaned up later, so we also have to worry less
+about cleaning up files after an exercise. For your projects, you should store
+this data on the P: drive.
+
+Let's add a remote for DVC:
+
+```powershell
+dvc remote add postbox "n:\Deltabox\Postbox\<yourname>\<your_remote_folder>"
+```
+
+Then consequently run:
+
+```powershell
+dvc push -r postbox
+```
+
+The location of the remote is stored in the ``.dvc/config`` file. We have to
+make sure this is also committed to git and shared on Github:
+
+```powershell
+git add .dvc/config
+git commit -m "Add dvc remote"
+git push
+```
+
+Congratulations, your project is 100% reproducible now!
+:100: :sparkles:
