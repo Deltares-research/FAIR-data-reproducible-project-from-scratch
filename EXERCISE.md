@@ -269,7 +269,7 @@ to version control your scripts from there. We'll run you through the basics and
 will only skim the surface. Git allows a lot more things, for example easy
 collaboration on a code base with colleagues.
 
-# 3.1 Initializing git
+## 3.1 Initializing git
 
 We'll start off by initializing a git repository:
 
@@ -280,7 +280,7 @@ git init
 This will create a hidden ``.git`` folder, which contains the full history of
 your scripts. 
 
-# 3.2 Committing the initial state
+## 3.2 Committing the initial state
 
 You now have an empty version control system. Time to add some files to it!
 First, let's see what files git can add to its version control system.
@@ -328,7 +328,7 @@ Type ``git status`` again and it will show you there's nothing to commit. You
 have now succesfully safely stored your text files! Any change you make to the
 files checked into git can now be tracked and reverted back to an old state.
 
-# 3.3 Modifying a file and committing changes
+## 3.3 Modifying a file and committing changes
 
 Let's modify a file and commit the changes. Open the ``README.md`` in your
 favorite editor and change the description. If you don't have inspiration what
@@ -364,7 +364,7 @@ and commit them:
 git commit -m "Modify project description"
 ```
 
-# 3.4 Checking version history
+## 3.4 Checking version history
 
 We can keep track of our version history by typing:
 
@@ -377,7 +377,7 @@ that it therefore is important to write short but descriptive commit messages,
 so you can more easily retrace your steps! Commit messages like "Update" are too
 generic to be of any use.
 
-# 3.5 Excluding files from source version control
+## 3.5 Excluding files from source version control
 
 Note that your folder also contains a ``.gitignore`` file. This was included in
 the cookiecutter project template. It can be opened and edited in any text
@@ -395,7 +395,7 @@ to not commit large files to git. Regular git also is not very useful to work
 with binary data. In that case, you are better off using git-lfs or DVC. We'll
 explain how to use DVC in a later stage of this exercise.
 
-# 3.6 Adding scripts to repository
+## 3.6 Adding scripts to repository
 
 Finally, we'll add the Python scripts, which are our workflow steps. These are
 already prepared in the folder ``scripts``. The scripts are named with a prefix
@@ -414,7 +414,7 @@ git add *
 git commit -m "Added scripts to repository"
 ```
 
-# 3.7 Download Modflow 6 executable
+## 3.7 Download Modflow 6 executable
 
 Finally, in preparation of the next part of the exercise, we'll download the
 Modflow 6 model code, [download the Modflow6 executable
@@ -447,7 +447,7 @@ might seem underwhelming for such a trivial situation, but it gets very useful
 in more complex situations, as snakemake deduces the dependence of steps and
 order of computation by itsself.
 
-# 4.1 Create a snakefile
+## 4.1 Create a snakefile
 
 To start configuring our snakemake workflow, start off by creating a file named
 ``snakefile``. By default, snakemake will look for a file named ``snakefile`` as
@@ -482,7 +482,7 @@ This will run the snakemake workflow. The option ``-c1`` is shorthand for
 This is enough, as we have not defined any independent steps which can be run in
 parallel.
 
-# 4.2 Adding a second step
+## 4.2 Adding a second step
 
 Let's define the second step to our workflow. We'll call the script
 ``src/1-prepare/1-discretization.py`` which creates the model's spatial
@@ -539,7 +539,7 @@ snakemake -c1 --forceall
 ```
 
 
-# 4.3 Finish your snakefile
+## 4.3 Finish your snakefile
 
 <details>
   <summary> Let's complete the Snakefile: (<i>click to expand, it will show you the
@@ -675,7 +675,7 @@ If everything went correct, the following plot is shown in
 
 ![](docs\groundwater_heads.png)
 
-# 4.4 Version control changes in git
+## 4.4 Version control changes in git
 
 Version control your changes in git:
 
@@ -708,7 +708,7 @@ following liabilities:
 
 Therefore we have to do better!
 
-# 5.1 Initialize DVC
+## 5.1 Initialize DVC
 
 We first have to initialize our DVC repository:
 
@@ -723,7 +723,7 @@ yet committed (verify with ``git status``). Commit these:
 git commit -m "Initialize DVC"
 ```
 
-# 5.2 Adding Modflow6 binary
+## 5.2 Adding Modflow6 binary
 
 Let's add our first file to DVC:
 
@@ -791,7 +791,7 @@ stores its different versions of data:
 1. The file is copied into the ``cache``, but the filename is changed into the
    hash.
 
-# 5.3 Adding external data
+## 5.3 Adding external data
 
 As outlined in the [introduction to this chapter](#5-data-version-control-dvc),
 we want to add the data we downloaded into the ``data/1-external`` folder as
@@ -837,7 +837,7 @@ git add .gitignore
 git commit -m "Add external data to DVC"
 ```
 
-# 5.4 Adding post-processed data
+## 5.4 Adding post-processed data
 
 Most projects are a lot more complex than this example project and take a lot
 more time to compute. It is therefore wise to also version control the
@@ -856,7 +856,7 @@ state.
 We therefore have to set up a remote and push our repositories to this. First,
 we'll work on sharing our git repository online. Next, we'll share our data.
 
-# 6.1 Where to share git repository?
+## 6.1 Where to share git repository?
 
 There are multiple very nice tools existing to share and collaborate with git
 repositories. The most commonly used these days being
@@ -880,7 +880,7 @@ instance](https://git.deltares.nl)
 
 If you are unsure where to share your data, ask your project leader.
 
-# 6.2 Sharing our git repository: Github
+## 6.2 Sharing our git repository: Github
 
 First, [sign up to Github if you haven't done
 so](https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github). 
@@ -910,7 +910,7 @@ git push -u origin main
 Now refresh your browser, and bask at your git repo in all its glory!
 [It should look something like this.](https://github.com/JoerivanEngelen/fair-project-from-scratch-result)
 
-# 6.3 Sharing data: DVC
+## 6.3 Sharing data: DVC
 
 DVC allows us to store and share data in dependent of Github. This is nice, as
 Github has quite restricted total repository size, [Ideally 1 GB, 5 GB max, and
