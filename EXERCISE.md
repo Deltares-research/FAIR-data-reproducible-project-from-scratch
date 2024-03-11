@@ -383,17 +383,17 @@ Note that your folder also contains a ``.gitignore`` file. This was included in
 the cookiecutter project template. It can be opened and edited in any text
 editor. Open it in your favorite text editor, and you will see certain folders
 and file extensions being listed here. These files will be ignored by git, and
-thus not kept in version control. This is useful: We do not want to store all
-our files, as bulky files can easily clog the version control system, and don't
-have to be stored. We already added a bunch of common files you are very likely
-not to want to add to your version control system in here. For example, you do
-not want your ``.pixi`` folder, containing 2GB of python installation specific
-to your machine, checked in git: the ``pixi.toml`` and ``pixi.lock`` file are
-enough to recreate the ``.pixi`` folder. Therefore the ``.pixi`` folder is
-included in the ``.gitignore`` file. In general, it is best to not commit large
-files to git. Regular git also is not very useful to work with binary data. In
-that case, you are better off using git-lfs or DVC. We'll explain how to use DVC
-in a later stage of this exercise.
+thus not kept in version control. This is useful: We do not want to version
+control all our files in git, as bulky files can easily clog the version control
+system, and don't have to be stored. We already added a bunch of common files
+you are very likely not to want to add to your version control system in here.
+For example, you do not want your ``.pixi`` folder, containing 2GB of python
+installation specific to your machine, checked in git: the ``pixi.toml`` and
+``pixi.lock`` file are enough to recreate the ``.pixi`` folder. Therefore the
+``.pixi`` folder is included in the ``.gitignore`` file. In general, it is best
+to not commit large files to git. Regular git also is not very useful to work
+with binary data. In that case, you are better off using git-lfs or DVC. We'll
+explain how to use DVC in a later stage of this exercise.
 
 # 3.6 Adding scripts to repository
 
@@ -413,6 +413,24 @@ Add and commit these files the same way you did this before:
 git add *
 git commit -m "Added scripts to repository"
 ```
+
+# 3.7 Download Modflow 6 executable
+
+Finally, in preparation of the next part of the exercise, we'll download the
+Modflow 6 model code, [download the Modflow6 executable
+here](https://github.com/MODFLOW-USGS/modflow6/releases/tag/6.4.2). If you are
+working on Windows, the exe is included in the ``mf6.4.2_win64.zip``. Unpack the
+zip somewhere, and copy ``mf6.4.2_win64/bin/mf6.exe`` to the project folder [you
+created in the first section](#1-create-directory), under ``bin/mf6.exe``.
+
+Verify that the ``.gitignore`` file is properly configured and thus ignores
+``/<your_name>/<path>/<to>/<folder>/bin/mf6.exe``. Check that git doesn't list
+it in a status check:
+
+```powershell
+git status
+```
+
 
 # 4 Setting up the workflow: Snakemake 
 
@@ -499,11 +517,34 @@ Run again in powershell:
 snakemake -c1
 ```
 
-# 4.2 Finish your snakefile
+Depending on whether the output under ``download_data`` is already generated,
+you'll see that Snakemake will run only the rule ``discretization`` or both. We
+can demonstrate this behaviour by deleting the files
+``data/1-external/layermodel.nc`` and ``data/2-interim/discretization.nc``, and
+running Snakemake again:
+
+```powershell
+rm data/1-external/layermodel.nc
+rm data/2-interim/discretization.nc
+snakemake -c1
+```
+
+You'll see Snakemake runs the 2 jobs again. Snakemake automatically detects if
+changes in data or scripts are made. There might be times, however, where you
+want to force recomputation of all steps, for example because you think
+Snakemake missed an important change to your workflow. Try running;
+
+```powershell
+snakemake -c1 --forceall
+```
+
+
+# 4.3 Finish your snakefile
 
 <details>
-  <summary> If you did everything correct, your Snakefile will look as follows: (<i>click to expand</i>)</summary>
-  <!-- have to be followed by an empty line! -->
+  <summary> Let's complete the Snakefile: (<i>click to expand, it will show you the
+  complete Snakefile</i>)</summary> <!-- have to be followed by an empty line!
+  -->
 
 ```
 rule plot_heads:
@@ -603,4 +644,268 @@ rule download_data:
 
 ```
 
+</details>
+
+Oomph! That's a lot of steps! It's hard to quickly infer all data dependencies
+just from looking at the Snakefile. First, because the author decided to put
+things in unintuitive order. Second, the workflow is not a single pipeline, but
+consists of several jobs which are partly independent of each other. Let's view
+the graph of the workflow. 
+
+To start off, make sure all rules are copied into the Snakefile. Next, run the
+following command:
+
+```powershell
+snakemake --dag | dot -Tpdf -o dag.pdf
+```
+
+This will create a graph rendition of the workflow, which will look roughly as
+follows:
+
+<img src="dag.svg">
+
+Run the complete workflow:
+
+```powershell
+snakemake -c1
+```
+
+If everything went correct, the following plot is shown in
+``reports/figures/groundwater_heads.png``:
+
+![](docs\groundwater_heads.png)
+
+# 4.4 Version control changes in git
+
+Version control your changes in git:
+
+```powershell
+git add snakefile
+git commit -m "Complete snakefile"
+```
+
+# 5 Data version control: DVC
+
+So far, we've version controlled our scripts and configuration files (e.g.
+``pixi.toml`` & ``snakefile``). These are text files, which can be version
+controlled in Git. Git by default, however, deals poorly with binary data, such
+as compiled executables, and large files. Therefore, we have to do separate data
+version control. In this exercise, we'll apply DVC for this, as it is built on
+top of git, and nicely separates data from text files. Our workflow currently
+depends on the current binary files which are not version controlled:
+
+1. The manually downloaded Modflow 6 executable
+1. Downloaded NetCDF files in first script
+
+The current state of the workflow might be already better than what you
+encountered or produced yourself in most projects. However, it still faces the
+following liabilities:
+
+* Links on the internet to download data can break
+* The data stored behind a link might change
+* This is outside our control
+* Colleagues have to put the downloaded executable in the right folder
+
+Therefore we have to do better!
+
+# 5.1 Initialize DVC
+
+We first have to initialize our DVC repository:
+
+```powershell
+dvc init
+```
+
+This will add three files which are already automatically added to git, but not
+yet committed (verify with ``git status``). Commit these:
+
+```powershell
+git commit -m "Initialize DVC"
+```
+
+# 5.2 Adding Modflow6 binary
+
+Let's add our first file to DVC:
+
+```powershell
+dvc add bin/mf6.exe
+```
+
+This will print the following error message:
+
+```
+ERROR: bad DVC file name 'bin\mf6.exe.dvc' is git-ignored.
+```
+
+This is a clear error message: we have to modify the ``.gitignore`` file to stop
+ignoring the ``bin/`` folder. As we now know what we are doing, we will not
+casually check in binary files into git anymore, we can modify the
+``.gitignore`` file. Open the ``.gitignore`` file and remove lines 94 and 95
+from it and save. To be explicit, these lines can be removed:
+
+```
+...
+
+# exclude compiled binaries
+bin/
+
+...
+```
+
+After you've removed these lines from the ``.gitignore`` file and saved, we'll first add version control these changes:
+
+```
+git add .gitignore
+git commit -m "Stop ignoring bin folder"
+```
+
+Run ```dvc add bin/mf6.exe``` again. ``git status`` will print the following:
+
+```
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   bin/.gitkeep
+        new file:   bin/mf6.exe.dvc
+```
+
+What happened? DVC added a textfile ``bin/mf6.exe.dvc``. Open this file (but do
+not modify!). The file contains a MD5 hash. In this case
+``68ee4172873768963691d01d0e55ed80``. This is a unique code based on the data
+itsself, which is used to check if any bit changed. Thus it is a quick way to
+verify if two files, with different timestamps, are in fact the same. If you
+want to know more about hashing, [some basics are outlined
+here.](https://www.codecademy.com/resources/blog/what-is-hashing/)
+Let's first commit our changes in git:
+
+```powershell
+git commit -m "Add exe to dvc"
+```
+
+Now look in the ``.dvc`` folder. A copy of the file will be store
+``.dvc/cache/files/md5/68/ee4172873768963691d01d0e55ed80``. This is how DVC
+stores its different versions of data: 
+
+1. A unique hash will be generated based on the data
+1. The hash is stored in a ``.dvc`` text file
+1. The file is copied into the ``cache``, but the filename is changed into the
+   hash.
+
+# 5.3 Adding external data
+
+As outlined in the [introduction to this chapter](#5-data-version-control-dvc),
+we want to add the data we downloaded into the ``data/1-external`` folder as
+well.
+
+First, in ``.gitignore``, modify the line ``data/1-external/`` into
+``data/1-external/*.nc``. Thus we instruct git to only ignore files with the
+``.nc`` extension. If you type:
+
+```powershell
+git diff
+```
+
+This should show you the following:
+
+```
+ # exclude data from source control by default
+-data/1-external
++data/1-external/*.nc
+ data/2-interim
+ data/3-input
+ data/4-output
+```
+
+We can consequently now add all files in 
+
+```
+dvc add --glob data/1-external/*.nc
+```
+
+> [!NOTE]
+>
+> The ``--glob`` option tells DVC to expand the wildcard ``*`` to match all
+> files.
+
+This will add all 6 netcdf files to DVC and create ``.dvc`` files.
+
+Check in your files in git:
+
+```powershell
+git add data
+git add .gitignore
+git commit -m "Add external data to DVC"
+```
+
+# 5.4 Adding post-processed data
+
+Most projects are a lot more complex than this example project and take a lot
+more time to compute. It is therefore wise to also version control the
+post-processed data in ``data/5-visualization``. Repeat the steps as in [the
+previous subchapter](#54-adding-post-processed-data), but now for the
+``data/5-visualization`` directory. This makes it easy to always retrace
+previous outputs of the workflow that were checked in DVC.
+
+# 6 Storing data externally
+
+Congratulations, you have made your project entirely reproducible! However,
+version control is only stored locally now, so a hardware crash will ruin your
+project. Furthermore, it is impossible to collaborate with colleagues in this
+state.
+
+We therefore have to set up a remote and push our repositories to this. First,
+we'll work on sharing our git repository online. Next, we'll share our data.
+
+# 6.1 Where to share git repository?
+
+There are multiple very nice tools existing to share and collaborate with git
+repositories. The most commonly used these days being
+[Github](https://github.com/). We are going to share our code for this exercise
+on our personal Github accounts. You need to share your real projects in the
+[Deltares-research Github group](https://github.com/Deltares-research), instead
+of your personal account, because Deltares owns the rights to anything you
+produce during your paid time. Note that everything shared here is shared on
+external servers, outside the Deltares campus. Some projects have a clause that
+no data should leave the Deltares campus. In that case, you should use [the
+Deltares private Gitlab instance](https://git.deltares.nl). This information
+might become outdated over time, therefore see the [Wiki page for the latest
+information](https://publicwiki.deltares.nl/display/GIT/).
+
+So in short:
+
+- Projects that can be shared on [Deltares-research Github
+group](https://github.com/Deltares-research)
+- Projects that cannot, should be pushed to [the Deltares private Gitlab
+instance](https://git.deltares.nl)
+
+If you are unsure where to share your data, ask your project leader.
+
+# 6.2 Sharing our git repository: Github
+
+First, [sign up to Github if you haven't done
+so](https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github). 
+
+Click on your user icon on the top right, and click "My repositories". This will
+show you an overview of your personal repositories.
+
+![](docs/github_your_repositories.png)
+
+On the top, next to the search bar, click the blue "New" button:
+
+![](docs/github_new_repository.png)
+
+In the presented form, think of a nice name for your repository, add a brief
+description, and make sure no README and LICENSE are added. This will create an
+empty repository in Github. Github will present us some commands to follow
+depending on our situation. Our case fits *"…or push an existing repository from
+the command line"*. Therefore run the following lines of code:
+
+```powershell
+git remote add origin https://github.com/<your_profile_name>/<your_repo_name_on_github>.git 
+git branch -M main 
+git push -u origin main
+```
+
+Now refresh your browser, and bask at your git repo in all its glory!
+[It should look something like this.](https://github.com/JoerivanEngelen/fair-project-from-scratch-result)
 
