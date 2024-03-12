@@ -17,7 +17,11 @@ We expect you to have installed:
 
 # 1. Create directory
 
-First create an empty folder somewhere on your machine. In general we advise to
+First create an empty folder somewhere on your machine. 
+
+## TODO: Add requirements folder name
+
+In general we advise to
 do this outside the OneDrive folder, as that has the following downsides:
     
 - The folder contains spaces (at least on Deltares laptops), this easily leads
@@ -82,6 +86,8 @@ pixi add cookiecutter jinja2-time
 >
 > At the time of writing (2024-03-06), cookiecutter didn't automatically install
 > a dependency ``jinja2-time``. Therefore this package has to be added manually.
+
+## TODO: Now check your toml file again
 
 Inspect your folder again. Pixi created a hidden folder ``.pixi`` and a
 ``pixi.lock`` file, containing the python environment and text representation of
@@ -673,7 +679,7 @@ snakemake -c1
 If everything went correct, the following plot is shown in
 ``reports/figures/groundwater_heads.png``:
 
-![](docs\groundwater_heads.png)
+![](docs/groundwater_heads.png)
 
 ## 4.4 Version control changes in git
 
@@ -791,6 +797,8 @@ stores its different versions of data:
 1. The file is copied into the ``cache``, but the filename is changed into the
    hash.
 
+## TODO: Write something about data duplication
+
 ## 5.3 Adding external data
 
 As outlined in the [introduction to this chapter](#5-data-version-control-dvc),
@@ -895,11 +903,11 @@ On the top, next to the search bar, click the blue "New" button:
 ![](docs/github_new_repository.png)
 
 In the presented form, think of a nice name for your repository, add a brief
-description, and make sure no README, .gitignore and LICENSE are added. This
-will create an empty repository in Github, which makes our lives significantly
-easier. Github will present us some commands to follow depending on our
-situation. Our case fits *"…or push an existing repository from the command
-line"*. Therefore run the following lines of code:
+description, and make sure **NO README, NO .gitignore and NO LICENSE** are
+added. This will create an empty repository in Github, which makes our lives
+significantly easier. Github will present us some commands to follow depending
+on our situation. Our case fits *"…or push an existing repository from the
+command line"*. Therefore run the following lines of code:
 
 ```powershell
 git remote add origin https://github.com/<your_profile_name>/<your_repo_name_on_github>.git 
