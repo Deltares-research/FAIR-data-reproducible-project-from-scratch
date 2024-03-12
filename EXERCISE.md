@@ -797,7 +797,8 @@ git add .gitignore
 git commit -m "Stop ignoring bin folder"
 ```
 
-Run ```dvc add bin/mf6.exe``` again. ``git status`` will print the following:
+Run ```dvc add bin/mf6.exe``` again, followed by ``git add bin``. ``git status``
+will print the following:
 
 ```
 On branch main
