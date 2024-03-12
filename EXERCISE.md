@@ -951,4 +951,4 @@ git push
 ```
 
 Congratulations, your project is 100% reproducible now!
-:100: :sparkles:
+:sparkles: :100: :sparkles:
