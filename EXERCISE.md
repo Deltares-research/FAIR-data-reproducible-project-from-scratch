@@ -19,18 +19,32 @@ We expect you to have installed:
 
 First create an empty folder somewhere on your machine. 
 
-## TODO: Add requirements folder name
+> [!TIP]
+> Here are some tips to save you headaches:
+> 
+> - Make sure your folder name is descriptive
+> - Make sure no spaces are included in folder names. Spaces easily leads
+>   to mistakes as this often requires extra user input (e.g. put the path between
+>   quotes). Furthermore often software contains bugs or doesn't even support
+>   spaces in paths.
+> - Make sure total paths don't get too long. This can make for quite unreadable
+>   paths. And furthermore, by default Windows has a character limit of 260
+>   characters for paths. Therefore, don't make folder names too long. By the way,
+>   sometimes you cannot go around long paths, e.g. when using Windows
+>   Computational Facilities. [In this case you can enable them by modifying the
+>   Registry](https://www.howtogeek.com/266621/how-to-make-windows-10-accept-file-paths-over-260-characters/)
+> 
 
-In general we advise to
-do this outside the OneDrive folder, as that has the following downsides:
-    
-- The folder contains spaces (at least on Deltares laptops), this easily leads
-  to mistakes as this often requires extra user input (e.g. put the path between
-  quotes). Furthermore often software contains bugs or doesn't even support
-  spaces in paths.
-- A python installation will be created, which creates lots of files (>40k
-  easily). This can easily clog your OneDrive synchroniztion
-- It is not necessary, our project will be reproducible!
+> [!WARNING]
+> 
+> In general, we advise to create a folder outside the OneDrive folder, as this
+> folder has the following downsides:
+>     
+> - The folder contains spaces (at least on Deltares laptops), 
+> - A python installation will be created, which creates lots of files (>40k
+>   easily). This can easily clog your OneDrive synchroniztion
+> - It is not necessary to backup our project on OneDrive, our project will be
+>   reproducible!
 
 Open a powershell/cmd session and type:
 
@@ -63,6 +77,7 @@ published on ``bioconda``, therefore we specify this channel as well.
 ```powershell
 pixi init --channel conda-forge --channel bioconda
 ```
+
 Inspect your folder's contents in TotalCommander/Windows Explorer.
 Alternatively, to inspect folder contents, you can print files and folders in
 your shell session by calling in Powershell:
@@ -87,11 +102,10 @@ pixi add cookiecutter jinja2-time
 > At the time of writing (2024-03-06), cookiecutter didn't automatically install
 > a dependency ``jinja2-time``. Therefore this package has to be added manually.
 
-## TODO: Now check your toml file again
-
 Inspect your folder again. Pixi created a hidden folder ``.pixi`` and a
 ``pixi.lock`` file, containing the python environment and text representation of
-the exact state of the python environment contents. 
+the exact state of the python environment contents. Now open your ``pixi.toml``
+file again. This will now contain cookiecutter as its dependency!
 
 We'll add DVC. During the creation of this course, we found that dvc tended to
 install an older version by default, therefore it is best to force installing
@@ -201,8 +215,19 @@ pixi shell
 Inspect the folder again by calling:
 
 ```powershell
-dir
+tree
 ```
+
+> [!TIP]
+>
+> To get a nicer tree view, with less clutter, you can use the ``Show-Tree``
+> Powershell script.
+> 
+> ```powershell
+> Install-Script -Name Show-Tree -Scope CurrentUser
+> Show-Tree -MaxDepth 2
+> ```
+
 
 You'll see the following structure (also conveniently described in the
 ``README.md``):
@@ -324,6 +349,12 @@ commit:
 git commit -m "My initial commit"
 ```
 
+> [!NOTE]
+>
+> The ``-m`` option specifies that a commit message follows. Always to make sure
+> to write short and concise commit messages! This makes it much easier to
+> retrace your steps and move back to a previous stage.
+
 After committing, files are added to the version control system. The reason why
 git does this in two steps is that it allows you to orchestrate your commits
 into logical steps for the history. In this case this is unnecessary, as we are
@@ -337,10 +368,11 @@ files checked into git can now be tracked and reverted back to an old state.
 ## 3.3 Modifying a file and committing changes
 
 Let's modify a file and commit the changes. Open the ``README.md`` in your
-favorite editor and change the description. If you don't have inspiration what
-to write, you can write "Reproducible workflow to run a groundwater model for
-the Drentse Hondsrug". Save the file, and type ``git status`` again to confirm
-git noticed changes to the file.
+favorite editor (e.g. Notepad++, VSCode, Spyder, etc.) and change the
+description. If you don't have inspiration what to write, you can write
+"Reproducible workflow to run a groundwater model for the Drentse Hondsrug".
+Save the file, and type ``git status`` again to confirm git noticed changes to
+the file.
 
 ![git status after changes](/docs/git_status_3.png)
 
@@ -375,7 +407,7 @@ git commit -m "Modify project description"
 We can keep track of our version history by typing:
 
 ```powershell
-git log
+git log --oneline
 ```
 
 This will print you the two commits you made with their commit messages. Note
@@ -797,7 +829,22 @@ stores its different versions of data:
 1. The file is copied into the ``cache``, but the filename is changed into the
    hash.
 
-## TODO: Write something about data duplication
+DVC will therefore create copy to a file to the ``cache`` folder, each time you
+call ``dvc add``. *Therefore, you should be wary to not add large files too much
+to DVC, as it will lead to a version control system with a huge size.* 
+
+Luckily, DVC has some nice tricks up its sleave which alleviate this pain as
+much as possible:
+
+* Each time you call ``dvc pull`` ([as you did in the first
+  exercise](https://github.com/Deltares-research/FAIR-data-example-project/blob/main/EXERCISE.md)),
+  DVC will only pull the latest version from the remote ([the "remote" is
+  explained in this chapter](#63-sharing-data-dvc)). DVC will not pull the full
+  version history locally by default.
+* If you work on Linux, it will use reflinks by default (which are not supported
+  on Windows) instead of copies. This will avoids data duplication between the
+  working directory and the DVC cache. [More info on this
+  here.](https://dvc.org/doc/user-guide/data-management/large-dataset-optimization)
 
 ## 5.3 Adding external data
 
