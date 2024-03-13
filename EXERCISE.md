@@ -24,10 +24,10 @@ First create an empty folder somewhere on your machine.
 > Here are some tips to save you headaches:
 > 
 > - Make sure your folder name is descriptive
-> - Make sure no spaces are included in folder names. Spaces easily leads
->   to mistakes as this often requires extra user input (e.g. put the path between
->   quotes). Furthermore often software contains bugs or doesn't even support
->   spaces in paths.
+> - Make sure no spaces are included in folder names. Spaces easily lead to
+>   mistakes as they often requires extra user input (e.g. put the path between
+>   quotes). Furthermore often software contains bugs when dealing with spaces
+>   in paths or doesn't even support them.
 > - Make sure total paths don't get too long. This can make for quite unreadable
 >   paths. And furthermore, by default Windows has a character limit of 260
 >   characters for paths. Therefore, don't make folder names too long. By the way,
@@ -78,6 +78,12 @@ published on ``bioconda``, therefore we specify this channel as well.
 ```powershell
 pixi init --channel conda-forge --channel bioconda
 ```
+
+> [!TIP]
+>
+> You can copy commands by clicking the "copy symbol" on the right hand side of
+> the code blocks. You can paste these in Powershell by pressing CTRL+V or
+> right-clicking.
 
 Inspect your folder's contents in TotalCommander/Windows Explorer.
 Alternatively, to inspect folder contents, you can print files and folders in
@@ -264,24 +270,24 @@ an ``AUTHORS.md`` file where all contributors to the project are credited. Also 
 
 > [!WARNING]
 >
-> The license added is very permissive, which we find works fine for most
+> The license added is very permissive, which we find works fine for most SGS
 > projects. However, you might want to change it to a stricter license. For
 > example, for secret projects you probably want to add a propietary license.
 
-All data that you start your project with is stored in the
-``data/1-external`` folder, these are usually the files you received from a
-client, or downloaded somewhere. In case of model update, you could treat the
-model before the update as "external data". This data is the starting point of
-your workflow. Usually external data has to be reworked and cleaned up in order
-to lead to meaningful results, this leads to pre-processed data is stored in
-``data/2-interim``. Most model codes have their own specific files (often not
-interoperable), these are stored ``data/3-input``. Model output data is stored
-in ``data/4-output``. Finally, model output has to be post-processed for
-plotting, this for example can be converting model-specific formats to more
-interoperable file formats, converting a 3D grid to VTK blocks for 3D plotting,
-or aggregating the data into a timeseries for a line plot. This data is stored
-in ``data/5-visualization``. Figures created from this post-processed data are
-stored in ``reports/figures``.
+The folder structure of this project template works as follows. All data that
+you start your project with is stored in the ``data/1-external`` folder, these
+are usually the files you received from a client, or downloaded somewhere. In
+case of model update, you could treat the model before the update as "external
+data". This data is the starting point of your workflow. Usually external data
+has to be reworked and cleaned up in order to lead to meaningful model input,
+this leads to pre-processed data, which is stored in ``data/2-interim``. Most
+model codes have their own specific files (often not interoperable) which are
+stored in ``data/3-input``. Model output data is stored in ``data/4-output``.
+Finally, model output has to be post-processed for plotting, this for example
+can be converting model-specific formats to more interoperable file formats,
+converting a 3D grid to VTK blocks for 3D plotting, or aggregating the data into
+a timeseries for a line plot. This data is stored in ``data/5-visualization``.
+Figures created from this post-processed data are stored in ``reports/figures``.
 
 > [!TIP]
 >
@@ -856,10 +862,10 @@ much as possible:
 
 > [!TIP]
 >
-> [See the borg project for a different approach to copying
-> files](https://github.com/borgbackup/borg). This software was not selected in
-> this training as its scope is restrained to backing up files, not version
-> control them.
+> [See the borg project for a different approach to store changes to binary
+> files instead of copying](https://github.com/borgbackup/borg). This software
+> was not selected in this training as its scope is restrained to backing up
+> files, not version control them.
 
 ## 5.3 Adding external data
 
