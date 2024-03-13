@@ -480,11 +480,11 @@ takes care of this. How it works is by checking for each step in the workflow
 what data comes in and what data comes out. This has to be specified explicitly
 by the user. For example, we have to tell snakemake that the file ``river.nc``
 is output of the script ``0-download-data.py`` and input to the script
-``1-surface-water.py``. Snakemake then will deduce by itsself that
+``1-surface-water.py``. Snakemake then will deduce by itself that
 ``0-download-data.py`` has to be called before ``1-surface-water.py``. This
 might seem underwhelming for such a trivial situation, but it gets very useful
 in more complex situations, as snakemake deduces the dependence of steps and
-order of computation by itsself.
+order of computation by itself.
 
 ## 4.1 Create a snakefile
 
@@ -817,7 +817,7 @@ Changes to be committed:
 What happened? DVC added a textfile ``bin/mf6.exe.dvc``. Open this file (but do
 not modify!). The file contains a MD5 hash. In this case
 ``68ee4172873768963691d01d0e55ed80``. This is a unique code based on the data
-itsself, which is used to check if any bit changed. Thus it is a quick way to
+itself, which is used to check if any bit changed. Thus it is a quick way to
 verify if two files, with different timestamps, are in fact the same. If you
 want to know more about hashing, [some basics are outlined
 here.](https://www.codecademy.com/resources/blog/what-is-hashing/)
@@ -982,7 +982,7 @@ Now refresh your browser, and bask at your git repo in all its glory!
 
 ## 6.3 Sharing data: DVC
 
-DVC allows us to store and share data in dependent of Github. This is nice, as
+DVC allows us to store and share data independent of Github. This is nice, as
 Github has quite restricted total repository size, [Ideally 1 GB, 5 GB max, and
 a per file limit of max 100
 MB](https://stackoverflow.com/questions/38768454/repository-size-limits-for-github-com).
