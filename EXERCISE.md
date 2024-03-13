@@ -24,12 +24,12 @@ First create an empty folder somewhere on your machine.
 > Here are some tips to save you headaches:
 > 
 > - Make sure your folder name is descriptive
-> - Make sure no spaces are included in folder names. Spaces easily leads
+> - Make sure no spaces are included in folder names. Spaces easily lead
 >   to mistakes as this often requires extra user input (e.g. put the path between
 >   quotes). Furthermore often software contains bugs or doesn't even support
 >   spaces in paths.
 > - Make sure total paths don't get too long. This can make for quite unreadable
->   paths. And furthermore, by default Windows has a character limit of 260
+>   paths and by default, Windows has a character limit of 260
 >   characters for paths. Therefore, don't make folder names too long. By the way,
 >   sometimes you cannot go around long paths, e.g. when using Windows
 >   Computational Facilities. [In this case you can enable them by modifying the
@@ -43,7 +43,7 @@ First create an empty folder somewhere on your machine.
 >     
 > - The folder contains spaces (at least on Deltares laptops), 
 > - A python installation will be created, which creates lots of files (>40k
->   easily). This can easily clog your OneDrive synchroniztion
+>   easily). This can easily clog your OneDrive synchronization itself
 > - It is not necessary to backup our project on OneDrive, our project will be
 >   reproducible!
 
