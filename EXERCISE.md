@@ -19,7 +19,8 @@ We expect you to have installed:
 
 First create an empty folder somewhere on your machine. 
 
-> [!TIP]
+> [!CAUTION]
+>
 > Here are some tips to save you headaches:
 > 
 > - Make sure your folder name is descriptive
@@ -181,7 +182,7 @@ Then remove the ``.pixi`` folder:
 rm .pixi -Force -Recurse
 ```
 
-> [!TIP]
+> [!CAUTION]
 >
 > A python environment consists of a lot of files, easily over 40K, and easily
 > becomes quite large, because of some common dependencies: most notorious is
@@ -702,10 +703,15 @@ follows:
 
 <img src="dag.svg">
 
-Run the complete workflow:
+You can see some steps are independent of each other. For example rule
+``recharge`` is independent of ``surface_water``, therefore these steps can be
+run in parallel. Let's run the complete workflow on 2 cores. Pay close attention
+to how snakemake runs its tasks, it should run the tasks ``discretization``,
+``suburface``, ``recharge``, ``initial_condition``, and ``surface_water`` in
+parallel:
 
 ```powershell
-snakemake -c1
+snakemake -c2
 ```
 
 If everything went correct, the following plot is shown in
@@ -831,10 +837,11 @@ stores its different versions of data:
    hash.
 
 DVC will therefore create copy to a file to the ``cache`` folder, each time you
-call ``dvc add``. *Therefore, you should be wary to not add large files too much
-to DVC, as it will lead to a version control system with a huge size.* 
+call ``dvc add``. *Therefore, you should be wary that frequently adding new
+versions of large files to DVC will lead to a version control system with a huge
+size.* 
 
-Luckily, DVC has some nice tricks up its sleave which alleviate this pain as
+DVC has some tricks up its sleave which alleviate this pain as
 much as possible:
 
 * Each time you call ``dvc pull`` ([as you did in the first
@@ -843,9 +850,16 @@ much as possible:
   explained in this chapter](#63-sharing-data-dvc)). DVC will not pull the full
   version history locally by default.
 * If you work on Linux, it will use reflinks by default (which are not supported
-  on Windows) instead of copies. This will avoids data duplication between the
+  on Windows) instead of copies. This will avoid data duplication between the
   working directory and the DVC cache. [More info on this
   here.](https://dvc.org/doc/user-guide/data-management/large-dataset-optimization)
+
+> [!TIP]
+>
+> [See the borg project for a different approach to copying
+> files](https://github.com/borgbackup/borg). This software was not selected in
+> this training as its scope is restrained to backing up files, not version
+> control them.
 
 ## 5.3 Adding external data
 
